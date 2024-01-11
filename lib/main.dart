@@ -1,5 +1,7 @@
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
 import 'package:dainik_media_newsapp/Home/home.dart';
+import 'package:dainik_media_newsapp/Home/mainpage.dart';
+import 'package:dainik_media_newsapp/Splashscreen/splashscreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:DainikMedia()
+      home:SplashScreen()
     );
   }
 }

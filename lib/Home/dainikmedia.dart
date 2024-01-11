@@ -8,7 +8,8 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 
 class DainikMedia extends StatefulWidget {
-  const DainikMedia({Key? key}) : super(key: key);
+  final String newsapi;
+  const DainikMedia({Key? key, required this.newsapi}) : super(key: key);
 
   @override
   State<DainikMedia> createState() => _DainikMediaState();
@@ -40,8 +41,7 @@ class _DainikMediaState extends State<DainikMedia> {
   }
 
   Future<List<dynamic>> fetchPosts() async {
-    final response = await http.get(
-        Uri.parse('https://danikmedia.com/wp-json/wp/v2/posts?per_page=11'));
+    final response = await http.get(Uri.parse(widget.newsapi));
 
     if (response.statusCode == 200) {
       final List<dynamic> fetchedPosts = json.decode(response.body);
@@ -67,9 +67,6 @@ class _DainikMediaState extends State<DainikMedia> {
     final double width = screensize.width;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('WordPress Posts'),
-      ),
       body: FutureBuilder<List<dynamic>>(
         future: fetchPosts(), // the future function to execute
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
@@ -99,6 +96,11 @@ class _DainikMediaState extends State<DainikMedia> {
                   return PostSkeleton();
                 }
                 String formattedDate = formatDate(post['date_gmt']);
+                String author = '';
+
+                if (post['author_info'] != null) {
+                  author = removeHtmlTags(post['author_info']['display_name']);
+                }
 
                 return Newscardview(
                     ontap: () {
@@ -109,7 +111,7 @@ class _DainikMediaState extends State<DainikMedia> {
                       );
                     },
                     date: formattedDate,
-                    author: removeHtmlTags(post['author_info']['display_name']),
+                    author: author,
                     title: removeHtmlTags(post['title']['rendered']),
                     subtitle: removeHtmlTags(post['excerpt']['rendered']),
                     imglink: post['jetpack_featured_media_url']);
