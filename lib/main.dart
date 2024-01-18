@@ -1,5 +1,5 @@
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
-import 'package:dainik_media_newsapp/Home/home.dart';
+import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/mainpage.dart';
 import 'package:dainik_media_newsapp/Home/testing.dart';
 import 'package:dainik_media_newsapp/Home/webstoryopener.dart';

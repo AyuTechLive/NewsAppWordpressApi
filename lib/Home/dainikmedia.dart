@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:dainik_media_newsapp/Home/fullarticle.dart';
-import 'package:dainik_media_newsapp/Home/home.dart';
+import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Loading/postskeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DainikMedia extends StatefulWidget {
   final String newsapi;
@@ -110,6 +111,9 @@ class _DainikMediaState extends State<DainikMedia> {
                         ),
                       );
                     },
+                    ontapshare: () {
+                      onShare(context, post);
+                    },
                     date: formattedDate,
                     author: author,
                     title: removeHtmlTags(post['title']['rendered']),
@@ -128,8 +132,13 @@ class _DainikMediaState extends State<DainikMedia> {
 
   String formatDate(String dateString) {
     final DateTime dateTime = DateTime.parse(dateString);
-    final DateFormat formatter =
-        DateFormat('d MMMM y, HH:mm'); // Updated pattern
+    final DateFormat formatter = DateFormat('d MMMM y'); // Updated pattern
     return formatter.format(dateTime);
+  }
+
+  void onShare(BuildContext context, dynamic post) async {
+    final String textToShare =
+        '${post['title']['rendered']} Read More On ${post['link']} ';
+    await Share.share(textToShare, subject: 'Sharing via Danik Media');
   }
 }

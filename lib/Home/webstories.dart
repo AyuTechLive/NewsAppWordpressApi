@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dainik_media_newsapp/Home/fullarticle.dart';
-import 'package:dainik_media_newsapp/Home/home.dart';
+import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/webstoryopener.dart';
 import 'package:dainik_media_newsapp/Loading/postskeleton.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +106,9 @@ class _WebStoriesState extends State<WebStories> {
                 }
 
                 return Newscardview(
+                  ontapshare: () {
+                    
+                  },
                     ontap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
