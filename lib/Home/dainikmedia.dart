@@ -34,26 +34,36 @@ String removeHtmlTags(String htmlString) {
 
 class _DainikMediaState extends State<DainikMedia> {
   List<dynamic> posts = [];
+  List<dynamic> posts2 = [];
+  final scrollController = ScrollController();
+  int page = 1;
+  bool isloadingmore = false;
 
   @override
   void initState() {
     super.initState();
+    scrollController.addListener(_scrolllistner);
     fetchPosts();
   }
 
   Future<List<dynamic>> fetchPosts() async {
-    final response = await http.get(Uri.parse(widget.newsapi));
+    final response = await http
+        .get(Uri.parse(widget.newsapi + 'posts?per_page=11&page=$page'));
 
     if (response.statusCode == 200) {
       final List<dynamic> fetchedPosts = json.decode(response.body);
 
-      fetchedPosts.sort((a, b) {
+  fetchedPosts.sort((a, b) {
         DateTime dateA = DateTime.parse(a['date']);
         DateTime dateB = DateTime.parse(b['date']);
         return dateB.compareTo(dateA);
-      });
+        
+     
+      
+});
+      
 
-      return fetchedPosts;
+      return posts2 =posts2+fetchedPosts;
     } else {
       return []; // Return an empty list or handle error appropriately
     }
@@ -69,7 +79,8 @@ class _DainikMediaState extends State<DainikMedia> {
 
     return Scaffold(
       body: FutureBuilder<List<dynamic>>(
-        future: fetchPosts(), // the future function to execute
+        future: fetchPosts(),
+        // the future function to execute
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While waiting for the future to complete, show the progress indicator
@@ -90,35 +101,43 @@ class _DainikMediaState extends State<DainikMedia> {
                   ),
                 );
               },
-              itemCount: snapshot.data!.length,
+              controller: scrollController,
+              itemCount: isloadingmore
+                  ? snapshot.data!.length + 1
+                  : snapshot.data!.length,
               itemBuilder: (context, index) {
-                final post = snapshot.data![index];
-                if (post == null || post.isEmpty) {
-                  return PostSkeleton();
-                }
-                String formattedDate = formatDate(post['date_gmt']);
-                String author = '';
+                if (index < snapshot.data!.length) {
+                  final post = snapshot.data![index];
+                  if (post == null || post.isEmpty) {
+                    return PostSkeleton();
+                  }
+                  String formattedDate = formatDate(post['date_gmt']);
+                  String author = '';
 
-                if (post['author_info'] != null) {
-                  author = removeHtmlTags(post['author_info']['display_name']);
-                }
+                  if (post['author_info'] != null) {
+                    author =
+                        removeHtmlTags(post['author_info']['display_name']);
+                  }
 
-                return Newscardview(
-                    ontap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PostDetailScreen(post: post),
-                        ),
-                      );
-                    },
-                    ontapshare: () {
-                      onShare(context, post);
-                    },
-                    date: formattedDate,
-                    author: author,
-                    title: removeHtmlTags(post['title']['rendered']),
-                    subtitle: removeHtmlTags(post['excerpt']['rendered']),
-                    imglink: post['jetpack_featured_media_url']);
+                  return Newscardview(
+                      ontap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => PostDetailScreen(post: post),
+                          ),
+                        );
+                      },
+                      ontapshare: () {
+                        onShare(context, post);
+                      },
+                      date: formattedDate,
+                      author: author,
+                      title: removeHtmlTags(post['title']['rendered']),
+                      subtitle: removeHtmlTags(post['excerpt']['rendered']),
+                      imglink: post['jetpack_featured_media_url']);
+                } else {
+                  return CircularProgressIndicator();
+                }
               },
             );
           } else {
@@ -140,5 +159,24 @@ class _DainikMediaState extends State<DainikMedia> {
     final String textToShare =
         '${post['title']['rendered']} Read More On ${post['link']} ';
     await Share.share(textToShare, subject: 'Sharing via Danik Media');
+  }
+
+  Future<void> _scrolllistner() async {
+    if (isloadingmore) return;
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
+      setState(() {
+        isloadingmore = true;
+      });
+      page = page + 1;
+      await fetchPosts();
+      setState(() {
+        isloadingmore = false;
+      });
+
+      print('scrolled');
+    } else {
+      print('none');
+    }
   }
 }

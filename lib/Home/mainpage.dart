@@ -1,4 +1,4 @@
-import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
+import 'package:dainik_media_newsapp/Home/dainikmedianew.dart';
 import 'package:dainik_media_newsapp/Home/webstories.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +10,20 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late PageController _pageController;
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,56 +32,62 @@ class _MainPageState extends State<MainPage> {
         automaticallyImplyLeading: false,
         title: Text('Dainik Media'),
       ),
-      body: _tabs[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Color.fromARGB(255, 42, 19, 133),
-        unselectedItemColor: Color.fromARGB(255, 53, 42, 48),
-       showUnselectedLabels: true, 
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          // Change the tab when a bottom navigation item is tapped
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
           setState(() {
             _currentIndex = index;
           });
+        },
+        children: [
+          DainikMedia2(newsapi: 'https://danikmedia.com/wp-json/wp/v2/'),
+          DainikMedia2(newsapi: 'https://graamsetu.com/wp-json/wp/v2/'),
+          DainikMedia2(newsapi: 'https://bhatnerpost.com/wp-json/wp/v2/'),
+          WebStories(
+              newsapi:
+                  'https://danikmedia.com/wp-json/web-stories/v1/web-story'),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Color.fromARGB(255, 42, 19, 133),
+        unselectedItemColor: Color.fromARGB(255, 53, 42, 48),
+        showUnselectedLabels: true,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          // Change the tab when a bottom navigation item is tapped
+          _pageController.animateToPage(
+            index,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
         items: [
           BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
-              
-             
             ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, ),
+            icon: Icon(
+              Icons.newspaper,
+            ),
             label: 'Daily News',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.article, ),
+            icon: Icon(
+              Icons.article,
+            ),
             label: 'Articles',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.book,
-              
             ),
-            label: 'web Stories',
+            label: 'Web Stories',
           ),
         ],
       ),
     );
   }
-
-  List<Widget> _tabs = [
-    DainikMedia(
-      newsapi: 'https://danikmedia.com/wp-json/wp/v2/posts?per_page=11',
-    ),
-    DainikMedia(
-        newsapi: 'https://graamsetu.com/wp-json/wp/v2/posts?per_page=11'),
-     DainikMedia(
-    newsapi: 'https://bhatnerpost.com/wp-json/wp/v2/posts?per_page=11'),
-    WebStories(
-        newsapi: 'https://danikmedia.com/wp-json/web-stories/v1/web-story')
-  ];
 }
