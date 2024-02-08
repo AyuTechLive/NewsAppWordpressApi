@@ -8,12 +8,12 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
-class DainikMedia2 extends StatefulWidget {
+class Categories extends StatefulWidget {
   final String newsapi;
-  const DainikMedia2({Key? key, required this.newsapi}) : super(key: key);
+  const Categories({Key? key, required this.newsapi}) : super(key: key);
 
   @override
-  State<DainikMedia2> createState() => _DainikMedia2State();
+  State<Categories> createState() => _CategoriesState();
 }
 
 String removeHtmlTags(String htmlString) {
@@ -32,7 +32,7 @@ String removeHtmlTags(String htmlString) {
   return decodedString;
 }
 
-class _DainikMedia2State extends State<DainikMedia2> {
+class _CategoriesState extends State<Categories> {
   // List<dynamic> posts = [];
   // List<dynamic> posts2 = [];
   List posts = [];
@@ -49,8 +49,8 @@ class _DainikMedia2State extends State<DainikMedia2> {
   }
 
   Future<void> fetchPost() async {
-    final response = await http
-        .get(Uri.parse(widget.newsapi + 'posts?per_page=11&page=$page'));
+    final response =
+        await http.get(Uri.parse('https://danikmedia.com/wp-json/wp/v2/posts'));
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body) as List;
       setState(() {
@@ -94,13 +94,13 @@ class _DainikMedia2State extends State<DainikMedia2> {
       itemBuilder: (context, index) {
         if (index < posts.length) {
           final post = posts[index];
-          final title = post['title']['rendered'];
-          String formattedDate = formatDate(post['date_gmt']);
-          String author = '';
+          // final title = post[index]['name'];
+          // String formattedDate = formatDate(post['date_gmt']);
+          // String author = '';
 
-          if (post['author_info'] != null) {
-            author = removeHtmlTags(post['author_info']['display_name']);
-          }
+          // if (post['author_info'] != null) {
+          //   author = removeHtmlTags(post['author_info']['display_name']);
+          // }
           if (post == null || post.isEmpty) {
             return PostSkeleton();
           }
@@ -118,11 +118,11 @@ class _DainikMedia2State extends State<DainikMedia2> {
               ontapshare: () {
                 onShare(context, post);
               },
-              date: formattedDate,
-              author: author,
-              title: removeHtmlTags(post['title']['rendered']),
-              subtitle: removeHtmlTags(post['excerpt']['rendered']),
-              imglink: post['jetpack_featured_media_url']);
+              date: 'formattedDate',
+              author: ' author',
+              title: post['tag_info'],
+              subtitle: 'hello',
+              imglink: 'hi');
         } else {
           return Padding(
               padding: EdgeInsets.only(top: height * 0.01),

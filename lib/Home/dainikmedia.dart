@@ -53,17 +53,13 @@ class _DainikMediaState extends State<DainikMedia> {
     if (response.statusCode == 200) {
       final List<dynamic> fetchedPosts = json.decode(response.body);
 
-  fetchedPosts.sort((a, b) {
+      fetchedPosts.sort((a, b) {
         DateTime dateA = DateTime.parse(a['date']);
         DateTime dateB = DateTime.parse(b['date']);
         return dateB.compareTo(dateA);
-        
-     
-      
-});
-      
+      });
 
-      return posts2 =posts2+fetchedPosts;
+      return posts2 = posts2 + fetchedPosts;
     } else {
       return []; // Return an empty list or handle error appropriately
     }
@@ -123,7 +119,10 @@ class _DainikMediaState extends State<DainikMedia> {
                       ontap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => PostDetailScreen(post: post),
+                            builder: (context) => PostDetailScreen(
+                              post: post,
+                              newsapi: widget.newsapi,
+                            ),
                           ),
                         );
                       },

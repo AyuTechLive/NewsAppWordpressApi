@@ -1,4 +1,8 @@
+import 'package:dainik_media_newsapp/Components/exractslugs.dart';
+import 'package:dainik_media_newsapp/Components/inapplinks.dart';
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
+import 'package:dainik_media_newsapp/Testing/testinglinks.dart';
+import 'package:dainik_media_newsapp/Utils/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -6,8 +10,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PostDetailScreen extends StatelessWidget {
   final Map<String, dynamic> post;
+  final String newsapi;
 
-  const PostDetailScreen({Key? key, required this.post}) : super(key: key);
+  const PostDetailScreen({Key? key, required this.post, required this.newsapi})
+      : super(key: key);
 
   TextStyle _textStyle(double fontSize) {
     // You can also use Theme.of(context) to access the current theme data
@@ -16,21 +22,22 @@ class PostDetailScreen extends StatelessWidget {
       height: 1.5, // Line height for better readability
     );
   }
+
   String removeHtmlTags(String htmlString) {
-  // Use HtmlUnescape to decode HTML entities and remove HTML tags
-  var unescape = HtmlUnescape();
-  var decodedString = unescape.convert(htmlString);
+    // Use HtmlUnescape to decode HTML entities and remove HTML tags
+    var unescape = HtmlUnescape();
+    var decodedString = unescape.convert(htmlString);
 
-  // Remove HTML tags
-  decodedString = decodedString.replaceAll(RegExp(r'<[^>]*>'), '');
+    // Remove HTML tags
+    decodedString = decodedString.replaceAll(RegExp(r'<[^>]*>'), '');
 
-  // Remove additional HTML entities that are not covered by HtmlUnescape
-  // This regex targets decimal and hexadecimal entities
-  decodedString = decodedString.replaceAll(RegExp(r'&#\d+;'), '');
-  decodedString = decodedString.replaceAll(RegExp(r'&#x[a-fA-F0-9]+;'), '');
+    // Remove additional HTML entities that are not covered by HtmlUnescape
+    // This regex targets decimal and hexadecimal entities
+    decodedString = decodedString.replaceAll(RegExp(r'&#\d+;'), '');
+    decodedString = decodedString.replaceAll(RegExp(r'&#x[a-fA-F0-9]+;'), '');
 
-  return decodedString;
-}
+    return decodedString;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +45,8 @@ class PostDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        //title: Text(unescape.convert(post['title']['rendered'])),
-      ),
+          //title: Text(unescape.convert(post['title']['rendered'])),
+          ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(8.0), // Consistent padding for the entire body
         child: Column(
@@ -73,34 +80,54 @@ class PostDetailScreen extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            HtmlWidget(
-              post['content']['rendered'],
-              textStyle: _textStyle(16), // Apply the base text style
-              customStylesBuilder: (element) {
-                switch (element.localName) {
-                  case 'h1':
-                    return {'font-size': '24px', 'margin': '12px 0'};
-                  case 'h2':
-                    return {'font-size': '20px', 'margin': '10px 0'};
-                  case 'p':
-                    return {'line-height': '1.5'};
+            HtmlWidget(post['content']['rendered'],
+                textStyle: _textStyle(16), // Apply the base text style
+                customStylesBuilder: (element) {
+              switch (element.localName) {
+                case 'h1':
+                  return {'font-size': '24px', 'margin': '12px 0'};
+                case 'h2':
+                  return {'font-size': '20px', 'margin': '10px 0'};
+                case 'p':
+                  return {'line-height': '1.5'};
+              }
+              return null;
+            }, customWidgetBuilder: (element) {
+              if (element.localName == 'img') {
+                final src = element.attributes['src'];
+                return src != null ? Image.network(src) : Placeholder();
+              }
+              return null;
+            }, onTapUrl: (url) async {
+              if (url.contains('https://danikmedia.com/') ||
+                  url.contains('https://graamsetu.com/') ||
+                  url.contains('https://bhatnerpost.com/')) {
+                MySnackbar.show(context, 'Loading Please Wait....');
+                final slug = extractSlugFromUrl(url);
+                final posts = await fetchPost11(slug, newsapi);
+
+                if (posts.isNotEmpty) {
+                  final post11 = posts[0];
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PostDetailScreen(
+                        post: post11,
+                        newsapi: newsapi,
+                      ),
+                    ),
+                  );
+                } else {
+                  MySnackbar.show(context, 'Error loading post');
                 }
-                return null;
-              },
-              customWidgetBuilder: (element) {
-                if (element.localName == 'img') {
-                  final src = element.attributes['src'];
-                  return src != null ? Image.network(src) : Placeholder();
-                }
-                return null;
-              },
-              onTapUrl: (url) {
-                // Implement a proper URL handling logic
-                // For example, you could use url_launcher to launch the URL
-                _launchURL(url.toString());
+
                 return true;
-              },
-            ),
+              } else {
+                _launchURL(url);
+                return true;
+              }
+            }),
           ],
         ),
       ),

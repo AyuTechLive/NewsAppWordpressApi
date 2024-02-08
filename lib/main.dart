@@ -1,3 +1,4 @@
+import 'package:dainik_media_newsapp/Categories/categories.dart';
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
 import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/mainpage.dart';
@@ -41,6 +42,6 @@ class MyApp extends StatelessWidget {
 
           useMaterial3: true,
         ),
-        home: SplashScreen());
+        home: MainPage());
   }
 }
