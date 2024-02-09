@@ -78,58 +78,62 @@ class _DainikMedia2State extends State<DainikMedia2> {
     }
 
     return Scaffold(
-        body: ListView.separated(
-      separatorBuilder: (context, index) {
-        return SizedBox(
-          width: width * 0.5,
-          child: Container(
-            width: width * 0.5,
-            height: height * 0.001,
-            color: Colors.grey,
-          ),
-        );
-      },
-      controller: scrollController,
-      itemCount: isloadingmore ? posts.length + 1 : posts.length,
-      itemBuilder: (context, index) {
-        if (index < posts.length) {
-          final post = posts[index];
-          final title = post['title']['rendered'];
-          String formattedDate = formatDate(post['date_gmt']);
-          String author = '';
+        body: Column(children: [
+      Expanded(
+        child: ListView.separated(
+          separatorBuilder: (context, index) {
+            return SizedBox(
+              width: width * 0.5,
+              child: Container(
+                width: width * 0.5,
+                height: height * 0.001,
+                color: Colors.grey,
+              ),
+            );
+          },
+          controller: scrollController,
+          itemCount: isloadingmore ? posts.length + 1 : posts.length,
+          itemBuilder: (context, index) {
+            if (index < posts.length) {
+              final post = posts[index];
+              final title = post['title']['rendered'];
+              String formattedDate = formatDate(post['date_gmt']);
+              String author = '';
 
-          if (post['author_info'] != null) {
-            author = removeHtmlTags(post['author_info']['display_name']);
-          }
-          if (post == null || post.isEmpty) {
-            return PostSkeleton();
-          }
-          return Newscardview(
-              ontap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PostDetailScreen(
-                      post: post,
-                      newsapi: widget.newsapi,
-                    ),
-                  ),
-                );
-              },
-              ontapshare: () {
-                onShare(context, post);
-              },
-              date: formattedDate,
-              author: author,
-              title: removeHtmlTags(post['title']['rendered']),
-              subtitle: removeHtmlTags(post['excerpt']['rendered']),
-              imglink: post['jetpack_featured_media_url']);
-        } else {
-          return Padding(
-              padding: EdgeInsets.only(top: height * 0.01),
-              child: Center(child: CircularProgressIndicator()));
-        }
-      },
-    ));
+              if (post['author_info'] != null) {
+                author = removeHtmlTags(post['author_info']['display_name']);
+              }
+              if (post == null || post.isEmpty) {
+                return PostSkeleton();
+              }
+              return Newscardview(
+                  ontap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PostDetailScreen(
+                          post: post,
+                          newsapi: widget.newsapi,
+                        ),
+                      ),
+                    );
+                  },
+                  ontapshare: () {
+                    onShare(context, post);
+                  },
+                  date: formattedDate,
+                  author: author,
+                  title: removeHtmlTags(post['title']['rendered']),
+                  subtitle: removeHtmlTags(post['excerpt']['rendered']),
+                  imglink: post['jetpack_featured_media_url']);
+            } else {
+              return Padding(
+                  padding: EdgeInsets.only(top: height * 0.01),
+                  child: Center(child: CircularProgressIndicator()));
+            }
+          },
+        ),
+      ),
+    ]));
   }
 
   String formatDate(String dateString) {

@@ -34,7 +34,7 @@ class _MainPageState extends State<MainPage> {
             return IconButton(
               icon: Icon(
                 Icons.menu,
-                color: Colors.white,
+                color: Colors.black,
               ),
               onPressed: () {
                 Scaffold.of(context).openDrawer(); // Opens the drawer
@@ -42,10 +42,9 @@ class _MainPageState extends State<MainPage> {
             );
           },
         ),
-        backgroundColor: Color(0Xff0A1E51),
         title: Text(
           'Danik Media',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(),
         ),
       ),
       body: PageView(

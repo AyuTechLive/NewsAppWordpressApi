@@ -81,6 +81,17 @@ class PostDetailScreen extends StatelessWidget {
         },
       );
 
+      // Remove Table of Contents content
+      decodedString = decodedString.replaceAllMapped(
+        RegExp(
+            r'Table of Contents<\/p>\n<span class=\"ez-toc-title-toggle\"><a[^>]*>.*?<\/a><\/span><\/div>\n<nav>(.*?)<\/nav>',
+            dotAll: true),
+        (match) {
+          // Replace content matching the pattern with an empty string
+          return '';
+        },
+      );
+
       if (decodedString.contains('" id=\"JOIN_US\"')) {
         int joinUsIndex = decodedString.indexOf('" id=\"JOIN_US\"');
 

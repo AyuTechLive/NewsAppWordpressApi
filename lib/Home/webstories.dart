@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 class WebStories extends StatefulWidget {
   final String newsapi;
@@ -98,8 +99,6 @@ class _WebStoriesState extends State<WebStories> {
                 }
                 String formattedDate = formatDate(post['date_gmt']);
                 String author = '';
-               
-                
 
                 if (post['author_info'] != null) {
                   author = removeHtmlTags(post['author_info']['display_name']);
@@ -107,21 +106,22 @@ class _WebStoriesState extends State<WebStories> {
 
                 return Newscardview(
                   ontapshare: () {
-                    
+                    onShare(context, post);
                   },
-                    ontap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              WebStoriesOpener(url: post['link'], title: ''),
-                        ),
-                      );
-                    },
-                    date: formattedDate,
-                    author: 'author',
-                    title: removeHtmlTags(post['title']['rendered']),
-                    subtitle: removeHtmlTags(post['excerpt']['rendered']),
-                    imglink: 'https://alppetro.co.id/dist/assets/images/default.jpg');
+                  ontap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            WebStoriesOpener(url: post['link'], title: ''),
+                      ),
+                    );
+                  },
+                  date: formattedDate,
+                  author: '',
+                  title: removeHtmlTags(post['title']['rendered']),
+                  subtitle: removeHtmlTags(post['excerpt']['rendered']),
+                  imglink: post['story_poster']['url'],
+                );
               },
             );
           } else {
@@ -131,6 +131,12 @@ class _WebStoriesState extends State<WebStories> {
         },
       ),
     );
+  }
+
+  void onShare(BuildContext context, dynamic post) async {
+    final String textToShare =
+        '${post['title']['rendered']} Read More On ${post['link']} ';
+    await Share.share(textToShare, subject: 'Sharing via Danik Media');
   }
 
   String formatDate(String dateString) {
