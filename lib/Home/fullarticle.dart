@@ -63,6 +63,24 @@ class PostDetailScreen extends StatelessWidget {
         },
       );
 
+      // Remove content like "Senator Penny Wong (@SenatorWong)"
+      decodedString = decodedString.replaceAllMapped(
+        RegExp(r'<p>(.*?Senator\s+[A-Za-z]+\s+@\S+.*?)<\/p>', dotAll: true),
+        (match) {
+          // Replace content matching the pattern with an empty string
+          return '';
+        },
+      );
+
+      // Remove content like </p>&mdash; Senator Penny Wong (@SenatorWong)
+      decodedString = decodedString.replaceAllMapped(
+        RegExp(r'</p>&mdash;(.*?)<', dotAll: true),
+        (match) {
+          // Replace content matching the pattern with an empty string
+          return '<'; // Maintain the tag structure
+        },
+      );
+
       if (decodedString.contains('" id=\"JOIN_US\"')) {
         int joinUsIndex = decodedString.indexOf('" id=\"JOIN_US\"');
 
@@ -209,15 +227,18 @@ class PostDetailScreen extends StatelessWidget {
     print('WebView URL: $url');
     return Container(
       height: 500,
+      width: 400,
       child: InAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse(url)),
-        initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-            javaScriptEnabled: true,
-            supportZoom: false,
-          ),
-        ),
-      ),
+          initialUrlRequest: URLRequest(url: Uri.parse(url)),
+          initialOptions: InAppWebViewGroupOptions(
+            crossPlatform: InAppWebViewOptions(
+              javaScriptEnabled: true,
+              supportZoom:
+                  false, // Consider changing this to support zoom if necessary
+              preferredContentMode: UserPreferredContentMode
+                  .MOBILE, // Ensures mobile-optimized content
+            ),
+          )),
     );
   }
 
