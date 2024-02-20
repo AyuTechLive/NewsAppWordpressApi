@@ -1,5 +1,6 @@
 import 'package:dainik_media_newsapp/Components/exractslugs.dart';
 import 'package:dainik_media_newsapp/Components/inapplinks.dart';
+import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
 import 'package:dainik_media_newsapp/Testing/testinglinks.dart';
 import 'package:dainik_media_newsapp/Utils/snackbar.dart';
@@ -125,8 +126,76 @@ class PostDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+
           //title: Text(unescape.convert(post['title']['rendered'])),
           ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/icons/whatsapp.png'),
+                        ),
+                        title: Text('Join Danik Media on WhatsApp'),
+                        onTap: () {
+                          launchUrl(Uri.parse(
+                              'https://www.whatsapp.com/channel/0029VaBzL0yKrWR57pL7w315'));
+
+                          // Handle Option 1
+                        },
+                      ),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/icons/telegram.png'),
+                        ),
+                        title: Text('Join Danik Media on Telegram'),
+                        onTap: () {
+                          // Handle Option 2
+                          launchUrl(Uri.parse('https://t.me/danikmedia'));
+                        },
+                      ),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/icons/facebook.png'),
+                        ),
+                        title: Text('Join Danik Media on Facebook'),
+                        onTap: () {
+                          launchUrl(
+                              Uri.parse('https://www.facebook.com/danikmedia'));
+                        },
+                      ),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/icons/instagram.png'),
+                        ),
+                        title: Text('Join Danik Media on Instagram'),
+                        onTap: () {
+                          launchUrl(Uri.parse(
+                              'https://www.instagram.com/danikmedia/'));
+                          // Handle Option 2
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          child: Image.asset(
+            'assets/icons/megaphone.png',
+            scale: 17,
+          )),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(8.0), // Consistent padding for the entire body
         child: Column(
@@ -228,6 +297,16 @@ class PostDetailScreen extends StatelessWidget {
                 return true;
               }
             }),
+            Row(
+              children: [],
+            ),
+            Text(
+              'Categories',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:dainik_media_newsapp/Home/mainpage.dart';
 import 'package:dainik_media_newsapp/Home/testing.dart';
 import 'package:dainik_media_newsapp/Home/webstoryopener.dart';
 import 'package:dainik_media_newsapp/Splashscreen/splashscreen.dart';
+import 'package:dainik_media_newsapp/Testing/test2.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Danik Media',
         theme: ThemeData(
           // This is the theme of your application.
           //
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
+            seedColor: Color(0xff2596BE),
             // brightness: Brightness.dark,
           ),
 

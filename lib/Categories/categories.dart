@@ -105,6 +105,8 @@ class _CategoriesState extends State<Categories> {
             return PostSkeleton();
           }
           return Newscardview(
+              ontapfacebookshare: () {},
+              ontapwhatsappshare: () {},
               ontap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(

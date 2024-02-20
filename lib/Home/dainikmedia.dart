@@ -116,6 +116,7 @@ class _DainikMediaState extends State<DainikMedia> {
                   }
 
                   return Newscardview(
+                      ontapfacebookshare: () {},
                       ontap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -126,6 +127,7 @@ class _DainikMediaState extends State<DainikMedia> {
                           ),
                         );
                       },
+                      ontapwhatsappshare: () {},
                       ontapshare: () {
                         onShare(context, post);
                       },

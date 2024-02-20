@@ -8,6 +8,8 @@ class Newscardview extends StatelessWidget {
   final String date;
   final VoidCallback ontap;
   final VoidCallback ontapshare;
+  final VoidCallback ontapwhatsappshare;
+  final VoidCallback ontapfacebookshare;
   const Newscardview(
       {super.key,
       required this.title,
@@ -15,7 +17,10 @@ class Newscardview extends StatelessWidget {
       required this.imglink,
       required this.ontap,
       required this.author,
-      required this.date, required this.ontapshare});
+      required this.date,
+      required this.ontapshare,
+      required this.ontapwhatsappshare,
+      required this.ontapfacebookshare});
 
   @override
   Widget build(BuildContext context) {
@@ -87,15 +92,15 @@ class Newscardview extends StatelessWidget {
                   // SizedBox(
                   //   width: width * 0.01,
                   // ),
-                  Text(
-                    author,
-                    style: TextStyle(fontSize: 14),
-                    maxLines: 1,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // Text(
+                  //   author,
+                  //   style: TextStyle(fontSize: 14),
+                  //   maxLines: 1,
+                  //   softWrap: true,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                   SizedBox(
-                    width: width * 0.03,
+                    width: width * 0.01,
                   ),
                   Text(
                     date,
@@ -105,7 +110,19 @@ class Newscardview extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Spacer(),
-                  IconButton(onPressed: ontapshare, icon: Icon(Icons.share_rounded))
+                  IconButton(
+                      onPressed: ontapfacebookshare,
+                      icon: Image.asset(
+                        'assets/icons/facebook.png',
+                        scale: 17.0,
+                      )),
+                  IconButton(
+                      onPressed: ontapwhatsappshare,
+                      icon: Image.asset(
+                        'assets/icons/whatsapp.png',
+                        scale: 17.0,
+                      )),
+                  IconButton(onPressed: ontapshare, icon: Icon(Icons.share)),
                 ],
               ),
               SizedBox(

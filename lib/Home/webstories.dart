@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebStories extends StatefulWidget {
   final String newsapi;
@@ -34,8 +35,12 @@ String removeHtmlTags(String htmlString) {
 }
 
 class _WebStoriesState extends State<WebStories> {
-  List<dynamic> posts = [];
-
+//  List<dynamic> posts = [];
+  List posts = [];
+  final scrollController = ScrollController();
+  int page = 1;
+  bool isloadingmore = false;
+  bool isLoadingInitial = true;
   @override
   void initState() {
     super.initState();
@@ -105,6 +110,12 @@ class _WebStoriesState extends State<WebStories> {
                 }
 
                 return Newscardview(
+                  ontapfacebookshare: () {
+                    onFacebookShare(context, post);
+                  },
+                  ontapwhatsappshare: () {
+                    onwhatsappShare(context, post);
+                  },
                   ontapshare: () {
                     onShare(context, post);
                   },
@@ -137,6 +148,47 @@ class _WebStoriesState extends State<WebStories> {
     final String textToShare =
         '${post['title']['rendered']} Read More On ${post['link']} ';
     await Share.share(textToShare, subject: 'Sharing via Danik Media');
+  }
+
+  void onwhatsappShare(BuildContext context, dynamic post) async {
+    final String textToShare =
+        '${post['title']['rendered']} Read More On ${post['link']} ';
+    // Encode the text to share
+    final String urlEncodedText = Uri.encodeComponent(textToShare);
+
+    // Create the WhatsApp share URL
+    final String whatsappUrl = "whatsapp://send?text=$urlEncodedText";
+
+    // Check if WhatsApp can be opened
+
+    // Launch WhatsApp
+    launchUrl(Uri.parse(whatsappUrl));
+
+    // If WhatsApp is not installed or the URL scheme does not work,
+    // you can either prompt the user or use the default share dialog as a fallback
+
+    // You can use Share.share as a fallback or handle it differently
+    //await Share.share(textToShare, subject: 'Sharing via Dainik Media');
+  }
+
+  void onFacebookShare(BuildContext context, dynamic post) async {
+    final String textToShare =
+        '${post['title']['rendered']} Read More On ${post['link']} ';
+    // URL to the Facebook share dialog
+    final String facebookUrl =
+        'https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(post['link'])}&quote=${Uri.encodeComponent(textToShare)}';
+
+    // Check if the Facebook share URL can be launched
+
+    // Launch the Facebook share dialog
+    launchUrl(Uri.parse(facebookUrl));
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url)) {
+      throw 'Could not launch $urlString';
+    }
   }
 
   String formatDate(String dateString) {

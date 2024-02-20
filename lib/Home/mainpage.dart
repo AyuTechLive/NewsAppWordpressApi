@@ -29,12 +29,13 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xff2596BE),
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
               icon: Icon(
                 Icons.menu,
-                color: Colors.black,
+                color: Colors.white,
               ),
               onPressed: () {
                 Scaffold.of(context).openDrawer(); // Opens the drawer
@@ -44,7 +45,7 @@ class _MainPageState extends State<MainPage> {
         ),
         title: Text(
           'Danik Media',
-          style: TextStyle(),
+          style: TextStyle(color: Colors.white),
         ),
       ),
       body: PageView(
@@ -64,7 +65,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Color.fromARGB(255, 42, 19, 133),
+        selectedItemColor: Color(0xff2596BE),
         unselectedItemColor: Color.fromARGB(255, 53, 42, 48),
         showUnselectedLabels: true,
         currentIndex: _currentIndex,
