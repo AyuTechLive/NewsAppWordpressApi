@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dainik_media_newsapp/Home/Components/webstorycardview.dart';
 import 'package:dainik_media_newsapp/Home/fullarticle.dart';
 import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/webstoryopener.dart';
@@ -109,7 +110,7 @@ class _WebStoriesState extends State<WebStories> {
                   author = removeHtmlTags(post['author_info']['display_name']);
                 }
 
-                return Newscardview(
+                return Webstorycard(
                   ontapfacebookshare: () {
                     onFacebookShare(context, post);
                   },

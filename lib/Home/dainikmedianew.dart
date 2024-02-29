@@ -50,20 +50,39 @@ class _DainikMedia2State extends State<DainikMedia2> {
   }
 
   Future<void> fetchPost() async {
-    final response = await http
-        .get(Uri.parse(widget.newsapi + 'posts?per_page=11&page=$page'));
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body) as List;
-      setState(() {
-        posts = posts + json;
-        isLoadingInitial = false; // Set to false once posts are fetched
-      });
+    if (widget.newsapi.contains('categories')) {
+      print('hiiiiiiiiiiiiiiiiiiiiiiiiiii');
+      final response =
+          await http.get(Uri.parse(widget.newsapi + '&page=$page'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as List;
+        setState(() {
+          posts = posts + json;
+          isLoadingInitial = false; // Set to false once posts are fetched
+        });
+      } else {
+        // Consider handling errors by showing a message or retry option
+        setState(() {
+          isLoadingInitial =
+              false; // Even on error, we're not loading initially anymore
+        });
+      }
     } else {
-      // Consider handling errors by showing a message or retry option
-      setState(() {
-        isLoadingInitial =
-            false; // Even on error, we're not loading initially anymore
-      });
+      final response = await http
+          .get(Uri.parse(widget.newsapi + 'posts?per_page=11&page=$page'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as List;
+        setState(() {
+          posts = posts + json;
+          isLoadingInitial = false; // Set to false once posts are fetched
+        });
+      } else {
+        // Consider handling errors by showing a message or retry option
+        setState(() {
+          isLoadingInitial =
+              false; // Even on error, we're not loading initially anymore
+        });
+      }
     }
   }
 
@@ -78,69 +97,74 @@ class _DainikMedia2State extends State<DainikMedia2> {
       );
     }
 
-    return Scaffold(
-        body: Column(children: [
-      Expanded(
-        child: ListView.separated(
-          separatorBuilder: (context, index) {
-            return SizedBox(
-              width: width * 0.5,
-              child: Container(
+    return RefreshIndicator(
+      onRefresh: () async {
+        await _refreshData();
+      },
+      child: Scaffold(
+          body: Column(children: [
+        Expanded(
+          child: ListView.separated(
+            separatorBuilder: (context, index) {
+              return SizedBox(
                 width: width * 0.5,
-                height: height * 0.001,
-                color: Colors.grey,
-              ),
-            );
-          },
-          controller: scrollController,
-          itemCount: isloadingmore ? posts.length + 1 : posts.length,
-          itemBuilder: (context, index) {
-            if (index < posts.length) {
-              final post = posts[index];
-              final title = post['title']['rendered'];
-              String formattedDate = formatDate(post['date_gmt']);
-              String author = '';
+                child: Container(
+                  width: width * 0.5,
+                  height: height * 0.001,
+                  color: Colors.grey,
+                ),
+              );
+            },
+            controller: scrollController,
+            itemCount: isloadingmore ? posts.length + 1 : posts.length,
+            itemBuilder: (context, index) {
+              if (index < posts.length) {
+                final post = posts[index];
+                final title = post['title']['rendered'];
+                String formattedDate = formatDate(post['date_gmt']);
+                String author = '';
 
-              if (post['author_info'] != null) {
-                author = removeHtmlTags(post['author_info']['display_name']);
-              }
-              if (post == null || post.isEmpty) {
-                return PostSkeleton();
-              }
-              return Newscardview(
-                  ontapfacebookshare: () {
-                    onFacebookShare(context, post);
-                  },
-                  ontap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => PostDetailScreen(
-                          post: post,
-                          newsapi: widget.newsapi,
+                if (post['author_info'] != null) {
+                  author = removeHtmlTags(post['author_info']['display_name']);
+                }
+                if (post == null || post.isEmpty) {
+                  return PostSkeleton();
+                }
+                return Newscardview(
+                    ontapfacebookshare: () {
+                      onFacebookShare(context, post);
+                    },
+                    ontap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PostDetailScreen(
+                            post: post,
+                            newsapi: widget.newsapi,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  ontapwhatsappshare: () {
-                    onwhatsappShare(context, post);
-                  },
-                  ontapshare: () {
-                    onShare(context, post);
-                  },
-                  date: formattedDate,
-                  author: author,
-                  title: removeHtmlTags(post['title']['rendered']),
-                  subtitle: removeHtmlTags(post['excerpt']['rendered']),
-                  imglink: post['jetpack_featured_media_url']);
-            } else {
-              return Padding(
-                  padding: EdgeInsets.only(top: height * 0.01),
-                  child: Center(child: CircularProgressIndicator()));
-            }
-          },
+                      );
+                    },
+                    ontapwhatsappshare: () {
+                      onwhatsappShare(context, post);
+                    },
+                    ontapshare: () {
+                      onShare(context, post);
+                    },
+                    date: formattedDate,
+                    author: author,
+                    title: removeHtmlTags(post['title']['rendered']),
+                    subtitle: removeHtmlTags(post['excerpt']['rendered']),
+                    imglink: post['jetpack_featured_media_url']);
+              } else {
+                return Padding(
+                    padding: EdgeInsets.only(top: height * 0.01),
+                    child: Center(child: CircularProgressIndicator()));
+              }
+            },
+          ),
         ),
-      ),
-    ]));
+      ])),
+    );
   }
 
   String formatDate(String dateString) {
@@ -194,6 +218,18 @@ class _DainikMedia2State extends State<DainikMedia2> {
     if (!await launchUrl(url)) {
       throw 'Could not launch $urlString';
     }
+  }
+
+  Future<void> _refreshData() async {
+    // Reset page to 1 and fetch fresh data
+    page = 1;
+    setState(() {
+      isLoadingInitial = true;
+    });
+    await fetchPost();
+    setState(() {
+      isLoadingInitial = false;
+    });
   }
 
   Future<void> _scrolllistner() async {

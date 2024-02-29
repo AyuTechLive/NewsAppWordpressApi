@@ -42,6 +42,7 @@ class _Test2State extends State<Test2> {
         title: Text('WordPress Categories'),
       ),
       body: ListView.builder(
+        scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (context, index) {
           return ListTile(

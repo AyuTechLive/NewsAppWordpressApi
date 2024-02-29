@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:dainik_media_newsapp/Categories/categories.dart';
+import 'package:dainik_media_newsapp/Colors.dart';
 import 'package:dainik_media_newsapp/Components/exractslugs.dart';
 import 'package:dainik_media_newsapp/Components/inapplinks.dart';
 import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
+import 'package:dainik_media_newsapp/Home/Components/categorycardview.dart';
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
+import 'package:dainik_media_newsapp/Home/dainikmedianew.dart';
 import 'package:dainik_media_newsapp/Testing/testinglinks.dart';
 import 'package:dainik_media_newsapp/Utils/snackbar.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +15,22 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
-class PostDetailScreen extends StatelessWidget {
+List<Category> categories = [];
+
+class PostDetailScreen extends StatefulWidget {
   final Map<String, dynamic> post;
   final String newsapi;
 
   PostDetailScreen({Key? key, required this.post, required this.newsapi})
       : super(key: key);
 
+  @override
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
+}
+
+class _PostDetailScreenState extends State<PostDetailScreen> {
   TextStyle _textStyle(double fontSize) {
     // You can also use Theme.of(context) to access the current theme data
     return TextStyle(
@@ -42,7 +56,7 @@ class PostDetailScreen extends StatelessWidget {
   }
 
   String extractContentBeforeJoinUs(String htmlString) {
-    if (newsapi.contains('https://danikmedia.com/')) {
+    if (widget.newsapi.contains('https://danikmedia.com/')) {
       var unescape = HtmlUnescape();
       var decodedString = unescape.convert(htmlString);
 
@@ -118,18 +132,33 @@ class PostDetailScreen extends StatelessWidget {
     }
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchCategories();
+  }
+
   final Set<String> processedInstagramUrls = Set<String>();
+
   final Set<String> processedTwitterUrls = Set<String>();
+
   @override
   Widget build(BuildContext context) {
+    final Size screensize = MediaQuery.of(context).size;
+    final double height = screensize.height;
+    final double width = screensize.width;
     final unescape = HtmlUnescape();
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.backgroundColor,
+        foregroundColor: Colors.white,
 
-          //title: Text(unescape.convert(post['title']['rendered'])),
-          ),
+        //title: Text(unescape.convert(post['title']['rendered'])),
+      ),
       floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.backgroundColor,
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -195,13 +224,14 @@ class PostDetailScreen extends StatelessWidget {
           child: Image.asset(
             'assets/icons/megaphone.png',
             scale: 17,
+            color: Colors.white,
           )),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(8.0), // Consistent padding for the entire body
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (post['jetpack_featured_media_url'] != null)
+            if (widget.post['jetpack_featured_media_url'] != null)
               // Padding(
               //   padding: const EdgeInsets.only(
               //       bottom: 12.0), // Spacing after the image
@@ -223,7 +253,7 @@ class PostDetailScreen extends StatelessWidget {
               //   ),
               // ),
               Text(
-                removeHtmlTags(post['title']['rendered']),
+                removeHtmlTags(widget.post['title']['rendered']),
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
               ),
             SizedBox(
@@ -232,7 +262,8 @@ class PostDetailScreen extends StatelessWidget {
             // Text(removeHtmlTags(
             //     '')),
 
-            HtmlWidget(extractContentBeforeJoinUs(post['content']['rendered']),
+            HtmlWidget(
+                extractContentBeforeJoinUs(widget.post['content']['rendered']),
                 textStyle: _textStyle(16), // Apply the base text style
                 customStylesBuilder: (element) {
               switch (element.localName) {
@@ -273,7 +304,7 @@ class PostDetailScreen extends StatelessWidget {
                   url.contains('https://bhatnerpost.com/')) {
                 MySnackbar.show(context, 'Loading Please Wait....');
                 final slug = extractSlugFromUrl(url);
-                final posts = await fetchPost11(slug, newsapi);
+                final posts = await fetchPost11(slug, widget.newsapi);
 
                 if (posts.isNotEmpty) {
                   final post11 = posts[0];
@@ -283,7 +314,7 @@ class PostDetailScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => PostDetailScreen(
                         post: post11,
-                        newsapi: newsapi,
+                        newsapi: widget.newsapi,
                       ),
                     ),
                   );
@@ -297,16 +328,59 @@ class PostDetailScreen extends StatelessWidget {
                 return true;
               }
             }),
-            Row(
-              children: [],
+            SizedBox(
+              height: 25,
             ),
             Text(
-              'Categories',
+              'Categories:-',
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.w600),
             ),
+            SizedBox(
+              height: height * 0.05,
+            ),
+            SizedBox(
+              height: height * 0.075,
+              child: ListView.separated(
+                separatorBuilder: (context, index) {
+                  return SizedBox(
+                    width: 20,
+                  );
+                },
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  return Categorycardview(
+                    title: categories[index].name,
+                    subtitle: 'subtitle',
+                    imglink:
+                        'https://danikmedia.com/wp-content/uploads/2024/02/06.jpeg',
+                    ontap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Categoriesop(
+                                title: categories[index].name,
+                                newsapi:
+                                    '${widget.newsapi}posts?categories=${categories[index].id}&'),
+                          ));
+                    },
+                    author: 'author',
+                    date: 'date',
+                  );
+                  // ListTile(
+                  //   onTap: () {
+                  //     print(categories[index].id);
+                  //   },
+                  //   title: Text(categories[index].name),
+                  //   subtitle: Text(categories[index].description),
+                  // );
+                },
+              ),
+            ),
+            SizedBox(height: height * 0.08)
           ],
         ),
       ),
@@ -332,6 +406,22 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
+  Future<void> fetchCategories() async {
+    final response = await http.get(Uri.parse('${widget.newsapi}categories'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonCategories = json.decode(response.body);
+
+      categories = jsonCategories
+          .map((category) => Category.fromJson(category))
+          .toList();
+
+      setState(() {});
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
+
   String extractInstagramUrl(String htmlString) {
     final match =
         RegExp(r'data-instgrm-permalink="(.*?)"').firstMatch(htmlString);
@@ -343,5 +433,40 @@ class PostDetailScreen extends StatelessWidget {
     if (!await launchUrl(url)) {
       throw 'Could not launch $urlString';
     }
+  }
+}
+
+class Category {
+  final int id;
+  final int count;
+  final String description;
+  final String link;
+  final String name;
+  final String slug;
+  final String taxonomy;
+  final int parent;
+
+  Category({
+    required this.id,
+    required this.count,
+    required this.description,
+    required this.link,
+    required this.name,
+    required this.slug,
+    required this.taxonomy,
+    required this.parent,
+  });
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      id: json['id'],
+      count: int.parse(json['count'].toString()), // Convert to int
+      description: json['description'] ?? '',
+      link: json['link'],
+      name: json['name'],
+      slug: json['slug'],
+      taxonomy: json['taxonomy'],
+      parent: int.parse(json['parent'].toString()), // Convert to int
+    );
   }
 }

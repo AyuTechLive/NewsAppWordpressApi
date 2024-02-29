@@ -1,4 +1,5 @@
 import 'package:dainik_media_newsapp/Categories/categories.dart';
+import 'package:dainik_media_newsapp/Colors.dart';
 import 'package:dainik_media_newsapp/Home/dainikmedia.dart';
 import 'package:dainik_media_newsapp/Home/Components/Newscardviewhome.dart';
 import 'package:dainik_media_newsapp/Home/mainpage.dart';
@@ -37,12 +38,12 @@ class MyApp extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Color(0xff2596BE),
+            seedColor: AppColors.backgroundColor,
             // brightness: Brightness.dark,
           ),
 
           useMaterial3: true,
         ),
-        home: MainPage());
+        home: SplashScreen());
   }
 }
