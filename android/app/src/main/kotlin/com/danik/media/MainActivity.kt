@@ -1,4 +1,4 @@
-package com.example.dainik_media_newsapp
+package com.danik.media
 
 import io.flutter.embedding.android.FlutterActivity
 

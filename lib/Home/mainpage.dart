@@ -267,17 +267,17 @@ class _MainPageState extends State<MainPage> {
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
-                'assets/icons/bhatnericon.png',
-                scale: 8,
-              ),
-              label: 'Bhatner Post',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
                 'assets/icons/gramsetuicon.png',
                 scale: 15,
               ),
               label: 'Gram Setu',
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                'assets/icons/bhatnericon.png',
+                scale: 8,
+              ),
+              label: 'Bhatner Post',
             ),
             BottomNavigationBarItem(
               icon: Icon(
